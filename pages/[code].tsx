@@ -9,6 +9,7 @@ export default function Home() {
     const {code} = router.query
     const [user, setUser] = useState(null);
     const [products, setProducts] = useState([]);
+    const [quantities, setQuantities] = useState([]);
 
     useEffect(() => {
         if (code !== undefined) {
@@ -18,10 +19,35 @@ export default function Home() {
 
                     setUser(data.user);
                     setProducts(data.products);
+                    setQuantities(data.products.map(p => ({
+                        product_id: p.id,
+                        quantity: 0,
+                    })));
                 }
             )();
         }
     }, [code]);
+
+    const change = (id: number, quantity: number) => {
+        setQuantities(quantities.map(q => {
+            if (q.product_id === id) {
+                return {
+                    ...q,
+                    quantity,
+                }
+            }
+
+            return q;
+        }));
+    }
+
+    const total = () => {
+        return quantities.reduce((s, q) => {
+            const product = products.find(p => p.id === q.product_id);
+
+            return s + product.price * q.quantity;
+        }, 0);
+    }
 
     return (
         <Layout>
@@ -51,15 +77,17 @@ export default function Home() {
                                             <div>
                                                 <h6 className="my-0">Quantity</h6>
                                             </div>
-                                            <input type="number" min="0" className="text-muted form-control"
-                                                   style={{width: '65px'}}/>
+                                            <input type="number" min="0" defaultValue={0}
+                                                   className="text-muted form-control"
+                                                   style={{width: '65px'}}
+                                                   onChange={e => change(product.id, parseInt(e.target.value))}/>
                                         </li>
                                     </div>
                                 );
                             })}
                             <li className="list-group-item d-flex justify-content-between">
                                 <span>Total (USD)</span>
-                                <strong>$12</strong>
+                                <strong>${total() ?? 0}</strong>
                             </li>
                         </ul>
 
