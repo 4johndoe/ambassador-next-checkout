@@ -1,6 +1,6 @@
 import Layout from "../components/Layout";
 import {useRouter} from "next/router";
-import {useEffect, useState} from "react";
+import {SyntheticEvent, useEffect, useState} from "react";
 import axios from "axios";
 import constants from "../constants";
 
@@ -10,6 +10,14 @@ export default function Home() {
     const [user, setUser] = useState(null);
     const [products, setProducts] = useState([]);
     const [quantities, setQuantities] = useState([]);
+
+    const [first_name, setFirstName] = useState('');
+    const [last_name, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [address, setAddress] = useState('');
+    const [country, setCountry] = useState('');
+    const [city, setCity] = useState('');
+    const [zip, setZip] = useState('');
 
     useEffect(() => {
         if (code !== undefined) {
@@ -47,6 +55,24 @@ export default function Home() {
 
             return s + product.price * q.quantity;
         }, 0);
+    }
+
+    const submit = async (e:SyntheticEvent) => {
+        e.preventDefault();
+
+        const {data} = await axios.post(`${constants.endpoint}/orders`, {
+            first_name,
+            last_name,
+            email,
+            address,
+            country,
+            city,
+            zip,
+            code,
+            products: quantities,
+        });
+
+        console.log(data)
     }
 
     return (
@@ -94,49 +120,56 @@ export default function Home() {
                     </div>
                     <div className="col-md-7 col-lg-8">
                         <h4 className="mb-3">Personal info</h4>
-                        <form className="needs-validation" noValidate>
+                        <form className="needs-validation" noValidate onSubmit={submit}>
                             <div className="row g-3">
                                 <div className="col-sm-6">
                                     <label htmlFor="firstName" className="form-label">First name</label>
                                     <input type="text" className="form-control" id="firstName"
-                                           placeholder="First name" required/>
+                                           placeholder="First name" required
+                                           onChange={e => setFirstName(e.target.value)}/>
                                 </div>
 
                                 <div className="col-sm-6">
                                     <label htmlFor="lastName" className="form-label">Last name</label>
                                     <input type="text" className="form-control" id="lastName"
-                                           placeholder="Last name" required/>
+                                           placeholder="Last name" required
+                                           onChange={e => setLastName(e.target.value)}/>
                                 </div>
 
                                 <div className="col-12">
                                     <label htmlFor="email" className="form-label">Email</label>
                                     <input type="email" className="form-control" id="email"
-                                           placeholder="you@example.com" required/>
+                                           placeholder="you@example.com" required
+                                           onChange={e => setEmail(e.target.value)}/>
                                 </div>
 
                                 <div className="col-12">
                                     <label htmlFor="address" className="form-label">Address</label>
                                     <input type="text" className="form-control" id="address"
                                            placeholder="1234 Main St"
-                                           required/>
+                                           required
+                                           onChange={e => setAddress(e.target.value)}/>
                                 </div>
 
                                 <div className="col-md-5">
                                     <label htmlFor="country" className="form-label">Country</label>
                                     <input type="text" className="form-control" id="country"
-                                           placeholder="Country"/>
+                                           placeholder="Country"
+                                           onChange={e => setCountry(e.target.value)}/>
                                 </div>
 
                                 <div className="col-md-4">
                                     <label htmlFor="state" className="form-label">City</label>
                                     <input type="text" className="form-control" id="city"
-                                           placeholder="City"/>
+                                           placeholder="City"
+                                           onChange={e => setCity(e.target.value)}/>
                                 </div>
 
                                 <div className="col-md-3">
                                     <label htmlFor="zip" className="form-label">Zip</label>
                                     <input type="text" className="form-control" id="zip"
-                                           placeholder="Zip"/>
+                                           placeholder="Zip"
+                                           onChange={e => setZip(e.target.value)}/>
                                 </div>
                             </div>
 
